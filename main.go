@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 )
 
 func main() {
@@ -12,8 +11,8 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Println("gk_cellphone:", *gk_cellphone)
-	fmt.Println("gk_password:", *gk_password)
-	fmt.Println("gk_country:", *gk_country)
+	geektime := NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
+	geektime.getIntro(140)
+	// geektime.getArticles(140, 100)
 
 }
