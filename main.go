@@ -14,6 +14,6 @@ func main() {
 	geektime := NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
 	// geektime.getIntro(140)
 	// geektime.getArticles(140, 100)
-	geektime.getArticle(69346)
+	geektime.getArticle(78984)
 
 }

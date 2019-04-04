@@ -27,7 +27,7 @@ func NewGeekTime(country string, cellphone string, password string) *geektime {
 		country:   country,
 		cellphone: cellphone,
 		password:  password,
-		client: &http.Client{Timeout: time.Second * 10, Transport: &http.Transport{TLSClientConfig: &tls.Config{
+		client: &http.Client{Timeout: time.Second * 1000, Transport: &http.Transport{TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		}}},
 		links: map[string]string{
@@ -42,7 +42,7 @@ func NewGeekTime(country string, cellphone string, password string) *geektime {
 	}
 }
 
-func (g *geektime) request(url string, payload map[string]interface{}, cookie string) (data interface{}, loginCookie string) {
+func (g *geektime) request(url string, payload *map[string]interface{}, cookie string) (data interface{}, loginCookie string) {
 
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(g.payload(payload)))
 	if err != nil {
@@ -98,7 +98,7 @@ func (g *geektime) request(url string, payload map[string]interface{}, cookie st
 	return temp["data"], loginCookie
 }
 
-func (g *geektime) payload(payload map[string]interface{}) (body []byte) {
+func (g *geektime) payload(payload *map[string]interface{}) (body []byte) {
 	bytesRepresentation, err := json.Marshal(payload)
 	if err != nil {
 		log.Fatalln(err)
@@ -123,7 +123,7 @@ func (g *geektime) getCookie() (cookie string) {
 		"appid":     1,
 	}
 
-	_, cookie = g.request(g.links["login"], payload, "")
+	_, cookie = g.request(g.links["login"], &payload, "")
 
 	g.cookie = cookie
 	return g.cookie
@@ -136,7 +136,7 @@ func (g *geektime) getIntro(cid int) interface{} {
 		"with_groupbuy": true,
 	}
 
-	data, _ := g.request(g.links["intro"], payload, cookie)
+	data, _ := g.request(g.links["intro"], &payload, cookie)
 
 	return data
 
@@ -152,7 +152,7 @@ func (g *geektime) getArticles(cid int, size int) interface{} {
 		"sample": false,
 	}
 
-	data, _ := g.request(g.links["articles"], payload, cookie)
+	data, _ := g.request(g.links["articles"], &payload, cookie)
 	return data
 }
 
@@ -162,7 +162,7 @@ func (g *geektime) getArticle(id int) interface{} {
 		"id":                id,
 		"include_neighbors": false,
 	}
-	data, _ := g.request(g.links["article"], payload, cookie)
+	data, _ := g.request(g.links["article"], &payload, cookie)
 
 	a, _ := data.(map[string]interface{})
 	fmt.Println(a["article_title"])
