@@ -12,7 +12,8 @@ func main() {
 	flag.Parse()
 
 	geektime := NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
-	geektime.getIntro(140)
+	// geektime.getIntro(140)
 	// geektime.getArticles(140, 100)
+	geektime.getArticle(69346)
 
 }

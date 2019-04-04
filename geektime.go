@@ -129,7 +129,7 @@ func (g *geektime) getCookie() (cookie string) {
 	return g.cookie
 }
 
-func (g *geektime) getIntro(cid int) {
+func (g *geektime) getIntro(cid int) interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"cid":           cid,
@@ -138,10 +138,11 @@ func (g *geektime) getIntro(cid int) {
 
 	data, _ := g.request(g.links["intro"], payload, cookie)
 
-	fmt.Println(data)
+	return data
+
 }
 
-func (g *geektime) getArticles(cid int, size int) {
+func (g *geektime) getArticles(cid int, size int) interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"cid":    cid,
@@ -152,6 +153,19 @@ func (g *geektime) getArticles(cid int, size int) {
 	}
 
 	data, _ := g.request(g.links["articles"], payload, cookie)
+	return data
+}
 
-	fmt.Println(data)
+func (g *geektime) getArticle(id int) interface{} {
+	cookie := g.getCookie()
+	var payload = map[string]interface{}{
+		"id":                id,
+		"include_neighbors": false,
+	}
+	data, _ := g.request(g.links["article"], payload, cookie)
+
+	a, _ := data.(map[string]interface{})
+	fmt.Println(a["article_title"])
+	// fmt.Println(a["article_content"])
+	return data
 }
