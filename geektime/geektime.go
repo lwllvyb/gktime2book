@@ -1,4 +1,4 @@
-package main
+package geektime
 
 import (
 	"bytes"
@@ -129,7 +129,7 @@ func (g *geektime) getCookie() (cookie string) {
 	return g.cookie
 }
 
-func (g *geektime) getIntro(cid int) interface{} {
+func (g *geektime) GetIntro(cid int) interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"cid":           cid,
@@ -142,7 +142,7 @@ func (g *geektime) getIntro(cid int) interface{} {
 
 }
 
-func (g *geektime) getArticles(cid int, size int) interface{} {
+func (g *geektime) GetArticles(cid int, size int) interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"cid":    cid,
@@ -156,7 +156,7 @@ func (g *geektime) getArticles(cid int, size int) interface{} {
 	return data
 }
 
-func (g *geektime) getArticle(id int) interface{} {
+func (g *geektime) GetArticle(id int) interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"id":                id,

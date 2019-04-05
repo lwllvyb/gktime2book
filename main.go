@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+
+	"github.com/gulywwx/gktime2book/geektime"
 )
 
 func main() {
@@ -11,9 +13,9 @@ func main() {
 
 	flag.Parse()
 
-	geektime := NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
+	gk := geektime.NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
 	// geektime.getIntro(140)
 	// geektime.getArticles(140, 100)
-	geektime.getArticle(78984)
+	gk.GetArticle(78984)
 
 }
