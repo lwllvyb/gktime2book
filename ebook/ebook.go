@@ -2,6 +2,7 @@ package ebook
 
 import (
 	"log"
+	"strings"
 
 	"github.com/gulywwx/gktime2book/geektime"
 )
@@ -17,7 +18,17 @@ func NewEBook(courseId int, outDir string, gkTime *geektime.GeekTime) *EBook {
 }
 
 func (b *EBook) Make() {
-	intro := b.gk.GetIntro(b.course_id)
-	log.Println(intro)
+	data := b.gk.GetIntro(b.course_id)
+	intro := *data
+	// log.Println(*intro)
+	intro["column_title"] = b.formatTitle(intro["column_title"].(string))
+	log.Println(intro["column_title"])
+}
 
+func (b *EBook) formatTitle(origin string) (result string) {
+	result = strings.Replace(origin, "/", "", -1)
+	result = strings.Replace(result, " ", "", -1)
+	result = strings.Replace(result, "+", "more", -1)
+	result = strings.Replace(result, "\"", "_", -1)
+	return result
 }

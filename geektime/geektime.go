@@ -41,7 +41,7 @@ func NewGeekTime(country string, cellphone string, password string) *GeekTime {
 	}
 }
 
-func (g *GeekTime) request(url string, payload *map[string]interface{}, cookie string) (data interface{}, loginCookie string) {
+func (g *GeekTime) request(url string, payload *map[string]interface{}, cookie string) (data *interface{}, loginCookie string) {
 
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(g.payload(payload)))
 	if err != nil {
@@ -94,7 +94,9 @@ func (g *GeekTime) request(url string, payload *map[string]interface{}, cookie s
 		log.Fatalln(err)
 	}
 
-	return temp["data"], loginCookie
+	var temp2 interface{} = temp["data"]
+
+	return &temp2, loginCookie
 }
 
 func (g *GeekTime) payload(payload *map[string]interface{}) (body []byte) {
@@ -128,7 +130,7 @@ func (g *GeekTime) getCookie() (cookie string) {
 	return g.cookie
 }
 
-func (g *GeekTime) GetIntro(cid int) interface{} {
+func (g *GeekTime) GetIntro(cid int) *map[string]interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"cid":           cid,
@@ -137,7 +139,9 @@ func (g *GeekTime) GetIntro(cid int) interface{} {
 
 	data, _ := g.request(g.links["intro"], &payload, cookie)
 
-	return data
+	var temp map[string]interface{} = (*data).(map[string]interface{})
+
+	return &temp
 
 }
 
@@ -163,8 +167,8 @@ func (g *GeekTime) GetArticle(id int) interface{} {
 	}
 	data, _ := g.request(g.links["article"], &payload, cookie)
 
-	a, _ := data.(map[string]interface{})
-	log.Println(a["article_title"])
+	// a, _ := data.(map[string]interface{})
+	// log.Println(a["article_title"])
 	// log.Println(a["article_content"])
 	return data
 }
