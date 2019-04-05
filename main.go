@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 
+	"github.com/gulywwx/gktime2book/ebook"
+
 	"github.com/gulywwx/gktime2book/geektime"
 )
 
@@ -14,8 +16,11 @@ func main() {
 	flag.Parse()
 
 	gk := geektime.NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
-	// geektime.getIntro(140)
-	// geektime.getArticles(140, 100)
-	gk.GetArticle(78984)
+	eb := ebook.NewEBook(140, "./", gk)
+	eb.Make()
+
+	// geektime.GetIntro(140)
+	// geektime.GetArticles(140, 100)
+	// gk.GetArticle(78984)
 
 }
