@@ -12,6 +12,12 @@ import (
 
 const host = "https://time.geekbang.org/serv/v1"
 
+type Intro struct {
+	column_title  string
+	column_intro  string
+	article_count int
+}
+
 type GeekTime struct {
 	client    *http.Client
 	cookie    string
@@ -26,7 +32,7 @@ func NewGeekTime(country string, cellphone string, password string) *GeekTime {
 		country:   country,
 		cellphone: cellphone,
 		password:  password,
-		client: &http.Client{Timeout: time.Second * 1000, Transport: &http.Transport{TLSClientConfig: &tls.Config{
+		client: &http.Client{Timeout: time.Second * 10000, Transport: &http.Transport{TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		}}},
 		links: map[string]string{
@@ -94,8 +100,13 @@ func (g *GeekTime) request(url string, payload *map[string]interface{}, cookie s
 		log.Fatalln(err)
 	}
 
-	var temp2 interface{} = temp["data"]
+	var temp2 interface{}
 
+	if url == g.links["login"] {
+		temp2 = temp
+	} else {
+		temp2 = temp["data"]
+	}
 	return &temp2, loginCookie
 }
 
@@ -145,7 +156,7 @@ func (g *GeekTime) GetIntro(cid int) *map[string]interface{} {
 
 }
 
-func (g *GeekTime) GetArticles(cid int, size int) interface{} {
+func (g *GeekTime) GetArticles(cid int, size int) *[]interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"cid":    cid,
@@ -156,10 +167,14 @@ func (g *GeekTime) GetArticles(cid int, size int) interface{} {
 	}
 
 	data, _ := g.request(g.links["articles"], &payload, cookie)
-	return data
+
+	var temp map[string]interface{} = (*data).(map[string]interface{})
+	var list []interface{} = temp["list"].([]interface{})
+
+	return &list
 }
 
-func (g *GeekTime) GetArticle(id int) interface{} {
+func (g *GeekTime) GetArticle(id int) *map[string]interface{} {
 	cookie := g.getCookie()
 	var payload = map[string]interface{}{
 		"id":                id,
@@ -170,5 +185,7 @@ func (g *GeekTime) GetArticle(id int) interface{} {
 	// a, _ := data.(map[string]interface{})
 	// log.Println(a["article_title"])
 	// log.Println(a["article_content"])
-	return data
+	var temp map[string]interface{} = (*data).(map[string]interface{})
+
+	return &temp
 }
