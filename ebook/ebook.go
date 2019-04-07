@@ -29,7 +29,6 @@ func (b *EBook) Make() {
 
 	list := b.gk.GetArticles(b.course_id, 1000)
 	articles := *list
-	log.Println(articles[10])
 
 	output_dir := b.out_dir + string(os.PathSeparator) + column_title
 	if _, err := os.Stat(output_dir); err == nil {
