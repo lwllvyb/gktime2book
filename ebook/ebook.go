@@ -31,9 +31,9 @@ func (b *EBook) Make() {
 	articles := *list
 
 	output_dir := b.out_dir + string(os.PathSeparator) + column_title
-	if _, err := os.Stat(output_dir); err == nil {
-		os.RemoveAll(output_dir)
-	}
+	// if _, err := os.Stat(output_dir); err == nil {
+	// 	os.RemoveAll(output_dir)
+	// }
 	_ = os.Mkdir(output_dir, os.ModePerm)
 
 	renderHTMLFile("简介", ParseImage(column_intro, output_dir), output_dir)
@@ -51,8 +51,13 @@ func (b *EBook) Make() {
 		article = *data
 		article_content := article["article_content"].(string)
 		// log.Println(article_title, id, article_content)
-		renderHTMLFile(article_title, ParseImage(article_content, output_dir), output_dir)
-		log.Println("下载", column_title, ":", article_title, "done")
+		if _, err := os.Stat(filepath.Join(output_dir, article_title+".html")); err == nil {
+			log.Println(column_title, ":", article_title, "已经下载")
+		} else {
+			renderHTMLFile(article_title, ParseImage(article_content, output_dir), output_dir)
+			log.Println("下载", column_title, ":", article_title, "done")
+		}
+
 	}
 
 }
