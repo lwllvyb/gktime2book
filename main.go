@@ -7,6 +7,7 @@ import (
 	"github.com/gulywwx/gktime2book/geektime"
 )
 
+//go run main.go --cellphone=xxxxxxx --password=*****
 func main() {
 	gk_cellphone := flag.String("cellphone", "1111", "a string")
 	gk_password := flag.String("password", "1111", "a string")
@@ -15,7 +16,9 @@ func main() {
 	flag.Parse()
 
 	gk := geektime.NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
-	eb := ebook.NewEBook(140, "d:", gk)
+	// eb := ebook.NewEBook(140, "d:", gk)
+	eb := ebook.NewEBook(164, "d:", gk)
+
 	eb.Make()
 
 	// geektime.GetIntro(140)

@@ -49,6 +49,10 @@ func (b *EBook) Make() {
 
 		data := b.gk.GetArticle(int(id))
 		article = *data
+
+		if article["article_content"] == nil {
+			break
+		}
 		article_content := article["article_content"].(string)
 		// log.Println(article_title, id, article_content)
 		if _, err := os.Stat(filepath.Join(output_dir, article_title+".html")); err == nil {
