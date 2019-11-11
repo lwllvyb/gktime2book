@@ -3,23 +3,33 @@ package main
 import (
 	"flag"
 
-	"github.com/gulywwx/gktime2book/ebook"
-	"github.com/gulywwx/gktime2book/geektime"
+	"gktime2book/ebook"
+	"gktime2book/geektime"
 )
 
 //go run main.go --cellphone=xxxxxxx --password=*****
 func main() {
-	gk_cellphone := flag.String("cellphone", "1111", "a string")
-	gk_password := flag.String("password", "1111", "a string")
+	gk_cellphone := flag.String("cellphone", "0", "a string")
+	gk_password := flag.String("password", ",0", "a string")
 	gk_country := flag.String("country", "86", "a string")
+	gk_cid := flag.Int("cid", 0, "coursel id")
 
 	flag.Parse()
 
 	gk := geektime.NewGeekTime(*gk_country, *gk_cellphone, *gk_password)
-	// eb := ebook.NewEBook(140, "d:", gk)
-	eb := ebook.NewEBook(164, "d:", gk)
+	if *gk_cid == 0 {
+		allColumns := gk.GetAllColumns()
+		columns := allColumns["1"]
+		for _, id := range columns {
+			// eb := ebook.NewEBook(140, "d:", gk)
+			eb := ebook.NewEBook(id, "./gitbook", gk)
+			eb.Make()
 
-	eb.Make()
+		}
+	} else {
+		eb := ebook.NewEBook(*gk_cid, "./gitbook", gk)
+		eb.Make()
+	}
 
 	// geektime.GetIntro(140)
 	// geektime.GetArticles(140, 100)

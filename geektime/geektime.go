@@ -12,6 +12,10 @@ import (
 
 const host = "https://time.geekbang.org/serv/v1"
 
+func init() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
+}
+
 type Intro struct {
 	column_title  string
 	column_intro  string
@@ -43,7 +47,9 @@ func NewGeekTime(country string, cellphone string, password string) *GeekTime {
 			"articles":    host + "/column/articles",
 			"article":     host + "/article",
 			"comments":    host + "/comments",
-			"audios":      host + "/column/audios"},
+			"audios":      host + "/column/audios",
+			"all":         host + "/column/all",
+		},
 	}
 }
 
@@ -121,9 +127,9 @@ func (g *GeekTime) payload(payload *map[string]interface{}) (body []byte) {
 }
 
 func (g *GeekTime) getCookie() (cookie string) {
-	if g.cookie != "" {
-		return g.cookie
-	}
+	// if g.cookie != "" {
+	// 	return g.cookie
+	// }
 
 	var payload = map[string]interface{}{
 		"country":   g.country,
@@ -188,4 +194,46 @@ func (g *GeekTime) GetArticle(id int) *map[string]interface{} {
 	var temp map[string]interface{} = (*data).(map[string]interface{})
 
 	return &temp
+}
+
+func (g *GeekTime) GetAllColumns() map[string][]int {
+	// courseMap := map[string]string{
+	// 	"1": "专栏", "2": "微课", "3": "视频", "4": "其他",
+	// }
+	all := make(map[string][]int, 10)
+	cookie := g.getCookie()
+	var payload = map[string]interface{}{}
+	raw, _ := g.request(g.links["all"], &payload, cookie)
+	data := (*raw).(map[string]interface{})
+	for key, value := range data {
+		data := value.(map[string]interface{})
+		// log.Println(courseMap[key])
+		for _, value := range data["list"].([]interface{}) {
+			column := value.(map[string]interface{})
+			id := int(column["id"].(float64))
+			all[key] = append(all[key], id)
+			// log.Printf("%v %v %v\n", id, column["column_title"], column["is_finish"])
+		}
+	}
+	return all
+
+	// // a, _ := data.(map[string]interface{})
+	// // log.Println(a["article_title"])
+	// // log.Println(a["article_content"])
+	// datas := (*raw).([]interface{})
+	// for _, data := range datas {
+	// 	tmp := data.(map[string]interface{})
+	// 	list := tmp["list"].([]interface{})
+	// 	for _, articleRawData := range list {
+	// 		articleData := articleRawData.(map[string]interface{})
+	// 		extraData := articleData["extra"].(map[string]interface{})
+	// 		id := extraData["column_id"].(float64)
+	// 		title := extraData["column_title"].(string)
+	// 		state := extraData["update_frequency"].(string)
+	// 		log.Println(id, title, state)
+	// 	}
+	// 	// log.Println(list)
+	// }
+
+	// return &
 }

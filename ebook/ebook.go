@@ -1,69 +1,83 @@
 package ebook
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
-	"github.com/gulywwx/gktime2book/geektime"
-	"github.com/gulywwx/gktime2book/util"
+	"gktime2book/geektime"
 )
 
 type EBook struct {
-	out_dir   string
-	course_id int
-	gk        *geektime.GeekTime
+	outDir   string
+	courseID int
+	gk       *geektime.GeekTime
 }
 
 func NewEBook(courseId int, outDir string, gkTime *geektime.GeekTime) *EBook {
-	return &EBook{course_id: courseId, out_dir: outDir, gk: gkTime}
+	return &EBook{courseID: courseId, outDir: outDir, gk: gkTime}
 }
 
 func (b *EBook) Make() {
-	data := b.gk.GetIntro(b.course_id)
+	// d := b.gk.GetAllColumns()
+	// log.Println(d)
+	// return
+	data := b.gk.GetIntro(b.courseID)
 	intro := *data
-	column_title := b.formatTitle(intro["column_title"].(string))
-	column_intro := intro["column_intro"].(string)
-	column_cover := intro["column_cover"].(string)
+	columnTitle := b.formatTitle(intro["column_title"].(string))
+	columnIntro := intro["column_intro"].(string)
+	// column_cover := intro["column_cover"].(string)
 
-	list := b.gk.GetArticles(b.course_id, 1000)
+	list := b.gk.GetArticles(b.courseID, 1000)
 	articles := *list
+	columeOutDir := filepath.Join(b.outDir, columnTitle)
 
-	output_dir := b.out_dir + string(os.PathSeparator) + column_title
-	// if _, err := os.Stat(output_dir); err == nil {
-	// 	os.RemoveAll(output_dir)
-	// }
-	_ = os.Mkdir(output_dir, os.ModePerm)
+	docDir := filepath.Join(columeOutDir, "docs")
 
-	renderHTMLFile("简介", ParseImage(column_intro, output_dir), output_dir)
-	log.Println("下载", column_title, "简介", "done")
+	_ = os.MkdirAll(docDir, os.ModePerm)
 
-	util.DownloadFile(filepath.Join(output_dir, "cover.jpg"), column_cover)
-	log.Println("下载", column_title, "封面", "done")
+	summary := "# SUMMARY\n\n"
+	summary += genSummaryData(columnTitle, "README.md")
+
+	// README.md
+	readmeFile := filepath.Join(columeOutDir, "README.md")
+	genMardown(readmeFile, columnTitle, ParseImage(columnIntro, docDir, "docs"), "")
+	// book.json
+	bookjsonFile := filepath.Join(columeOutDir, "book.json")
+	genBookJSONFile(bookjsonFile, columnTitle, "zh")
+
+	log.Println("下载", columnTitle, columnTitle, "done")
 
 	for _, a := range articles {
-		var article map[string]interface{} = a.(map[string]interface{})
-		article_title := b.formatTitle(article["article_title"].(string))
+		article := a.(map[string]interface{})
+		articleTitle := article["article_title"].(string)
 		id := article["id"].(float64)
 
 		data := b.gk.GetArticle(int(id))
 		article = *data
-
+		// log.Println(article)
 		if article["article_content"] == nil {
 			break
 		}
-		article_content := article["article_content"].(string)
-		// log.Println(article_title, id, article_content)
-		if _, err := os.Stat(filepath.Join(output_dir, article_title+".html")); err == nil {
-			log.Println(column_title, ":", article_title, "已经下载")
+		articleMD := strconv.FormatInt(int64(id), 10) + ".md"
+		articleMDPath := filepath.Join(docDir, articleMD)
+		if _, err := os.Stat(articleMDPath); err == nil {
+			log.Printf("%s:%s already done\n", columnTitle, articleTitle)
 		} else {
-			renderHTMLFile(article_title, ParseImage(article_content, output_dir), output_dir)
-			log.Println("下载", column_title, ":", article_title, "done")
+			articleContent := article["article_content"].(string)
+			content := ParseImage(articleContent, docDir, "")
+			audioHTTP := article["audio_download_url"].(string)
+			audioName := ParseAudio(audioHTTP, docDir)
+			genMardown(articleMDPath, articleTitle, content, audioName)
+			log.Printf("Download %s:%s done\n", columnTitle, articleTitle)
 		}
-
+		summary += genSummaryData(articleTitle, "./docs/"+articleMD)
 	}
-
+	// SUMMARY.md
+	ioutil.WriteFile(filepath.Join(columeOutDir, "SUMMARY.md"), []byte(summary), os.ModePerm)
 }
 
 func (b *EBook) formatTitle(origin string) (result string) {
