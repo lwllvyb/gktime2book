@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gktime2book/geektime"
+	"github.com/lwllvyb/gktime2book/geektime"
 )
 
 type EBook struct {

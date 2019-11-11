@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 
-	"gktime2book/ebook"
-	"gktime2book/geektime"
+	"github.com/lwllvyb/gktime2book/ebook"
+	"github.com/lwllvyb/gktime2book/geektime"
 )
 
 //go run main.go --cellphone=xxxxxxx --password=*****

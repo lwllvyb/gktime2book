@@ -16,7 +16,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gktime2book/util"
+	"github.com/lwllvyb/gktime2book/util"
 
 	"github.com/mattn/godown"
 )
